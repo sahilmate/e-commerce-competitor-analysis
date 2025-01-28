@@ -22,8 +22,8 @@ Before running the project, make sure you have the following installed:
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/e-commerce-competitor-strategy-dashboard.git
-cd e-commerce-competitor-strategy-dashboard
+git clone https://github.com/sahilmate/e-commerce-competitor-analysis.git
+cd e-commerce-competitor-analysis
 ```
 
 ### 2. Install dependencies
