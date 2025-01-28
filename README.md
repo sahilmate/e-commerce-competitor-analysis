@@ -142,10 +142,8 @@ SLACK_WEBHOOK_URL=your_slack_webhook_url
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
----
 
-Feel free to modify and improve this project to suit your needs. If you encounter any issues, please open an issue in the GitHub repository, and I will try to address it as soon as possible.
 
-```
+
 
 
