@@ -137,9 +137,15 @@ Make sure to store these values securely in the `.env` file, as shown below:
 GROQ_API_KEY=your_groq_api_key
 SLACK_WEBHOOK_URL=your_slack_webhook_url
 ```
+## Slack Webhook Image:
+![Slack Webhook Image](https://github.com/sahilmate/e-commerce-competitor-analysis/blob/main/Slack%20Webhook.jpeg)
+
+## Streamlit Dashboard Images: 
+![Streamlit Dashboard](https://github.com/sahilmate/e-commerce-competitor-analysis/blob/main/Streamlit%20Dashboard-1.jpeg)
+![Streamlit Dashboard](https://github.com/sahilmate/e-commerce-competitor-analysis/blob/main/Streamlit%20Dashboard-2.jpeg)
+
 
 ## License
-
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 
