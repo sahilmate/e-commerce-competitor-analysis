@@ -11,7 +11,6 @@ from sklearn.model_selection import train_test_split
 from statsmodels.tsa.arima.model import ARIMA
 from transformers import pipeline
 
-
 from dotenv import load_dotenv
 import os
 
@@ -25,30 +24,31 @@ SLACK_WEBHOOK = os.getenv("SLACK_WEBHOOK_URL")
 def truncate_text(text, max_length=512):
     return text[:max_length]
 
-
 def load_competitor_data():
     """Load competitor data from a CSV file."""
     data = pd.read_csv("price_data.csv")
     print(data.head())
     return data
 
-
 def load_reviews_data():
     """Load reviews data from a CSV file."""
     reviews = pd.read_csv("review_data.csv")
     return reviews
 
-
 def analyze_sentiment(reviews):
     """Analyze customer sentiment for reviews."""
-    sentiment_pipeline = pipeline("sentiment-analysis")
+    sentiment_pipeline = pipeline("sentiment-analysis")  # HuggingFace Transformer Pipeline
     return sentiment_pipeline(reviews)
 
 def train_predictive_model(data):
     """Train a predictive model for competitor pricing strategy."""
-    data["Discount"] = data["Discount"].str.replace("%", "").astype(float)
+    # Only try to remove "%" if Discount is a string; otherwise, assume it's already numeric.
+    if data["Discount"].dtype == object:
+        data["Discount"] = data["Discount"].str.replace("%", "").astype(float)
     data["Price"] = data["Price"].astype(int)
+    # Create a simple target variable based on current Price and Discount.
     data["Predicted_Discount"] = data["Discount"] + (data["Price"] * 0.05).round(2)
+
 
     X = data[["Price", "Discount"]]
     y = data["Predicted_Discount"]
@@ -68,10 +68,10 @@ def forecast_discounts_arima(data, future_days=5):
     :param future_days: Number of days to forecast.
     :return: DataFrame with historical and forecasted discounts.
     """
-
     data = data.sort_index()
-    print(product_data.index)
+    print(data.index)
 
+    # Ensure Discount is numeric
     data["Discount"] = pd.to_numeric(data["Discount"], errors="coerce")
     data = data.dropna(subset=["Discount"])
 
@@ -80,9 +80,7 @@ def forecast_discounts_arima(data, future_days=5):
         try:
             data.index = pd.to_datetime(data.index)
         except Exception as e:
-            raise ValueError(
-                "Index must be datetime or convertible to datetime."
-            ) from e
+            raise ValueError("Index must be datetime or convertible to datetime.") from e    
 
     model = ARIMA(discount_series, order=(5, 1, 0))
     model_fit = model.fit()
@@ -98,7 +96,7 @@ def forecast_discounts_arima(data, future_days=5):
     return forecast_df
 
 def send_to_slack(data):
-    """ """
+    """Send text data to Slack via webhook."""
     payload = {"text": data}
     response = requests.post(
         SLACK_WEBHOOK,
@@ -120,7 +118,6 @@ def generate_strategy_recommendation(product_name, competitor_data, sentiment):
 3. **Sentiment Analysis**:
 {sentiment}
 
-
 5. **Today's Date**: {str(date)}
 
 ### Task:
@@ -135,8 +132,6 @@ Provide your recommendations in a structured format:
 2. **Promotional Campaign Ideas**
 3. **Customer Satisfaction Recommendations**
     """
-
-    messages = [{"role": "user", "content": prompt}]
 
     data = {
         "messages": [{"role": "user", "content": prompt}],
@@ -155,11 +150,9 @@ Provide your recommendations in a structured format:
     response = res["choices"][0]["message"]["content"]
     return response
 
-
 ####--------------------------------------------------##########
 
 st.set_page_config(page_title="E-Commerce Competitor Strategy Dashboard", layout="wide")
-
 
 st.title("E-Commerce Competitor Strategy Dashboard")
 st.sidebar.header("Select a Product")
@@ -172,7 +165,6 @@ products = [
 ]
 selected_product = st.sidebar.selectbox("Choose a product to analyze:", products)
 
-
 competitor_data = load_competitor_data()
 reviews_data = load_reviews_data()
 
@@ -184,12 +176,9 @@ st.subheader("Competitor Data")
 st.table(product_data.tail(5))
 
 if not product_reviews.empty:
-    product_reviews["reviews"] = product_reviews["reviews"].apply(
-        lambda x: truncate_text(x, 512)
-    )
+    product_reviews["reviews"] = product_reviews["reviews"].apply(lambda x: truncate_text(x, 512))
     reviews = product_reviews["reviews"].tolist()
     sentiments = analyze_sentiment(reviews)
-
     st.subheader("Customer Sentiment Analysis")
     sentiment_df = pd.DataFrame(sentiments)
     fig = px.bar(sentiment_df, x="label", title="Sentiment Analysis Results")
@@ -197,30 +186,38 @@ if not product_reviews.empty:
 else:
     st.write("No reviews available for this product.")
 
-
-# Preprocessing
-
+# Preprocessing: Convert Date to datetime, sort, and ensure Discount is numeric.
 product_data["Date"] = pd.to_datetime(product_data["Date"], errors="coerce")
 product_data = product_data.dropna(subset=["Date"])
 product_data.set_index("Date", inplace=True)
 product_data = product_data.sort_index()
-
 product_data["Discount"] = pd.to_numeric(product_data["Discount"], errors="coerce")
 product_data = product_data.dropna(subset=["Discount"])
 
-# Forecasting Model
+# ARIMA Forecasting: Forecast next 5 days.
 product_data_with_predictions = forecast_discounts_arima(product_data)
-
-
-st.subheader("Competitor Current and Predicted Discounts")
+st.subheader("ARIMA Forecast for Next 5 Days")
 st.table(product_data_with_predictions.tail(10))
 
+# Random Forest Predictions: Train the model on historical data and show predictions.
+rf_data = product_data.reset_index()  # Bring Date back as a column.
+rf_model = train_predictive_model(rf_data.copy())
+rf_data["RF_Predicted_Discount"] = rf_model.predict(rf_data[["Price", "Discount"]])
+# Convert the predicted discount into a percentage relative to the Price.
+# For example: discount percentage = (predicted_discount / Price) * 100.
+rf_data["RF_Predicted_Discount_Percent"] = (rf_data["RF_Predicted_Discount"] / rf_data["Price"]) * 100
+# Format the percentage nicely
+rf_data["RF_Predicted_Discount_Percent"] = rf_data["RF_Predicted_Discount_Percent"].apply(lambda x: f"{x:.2f}%")
+st.subheader("Random Forest Predictions on Historical Data")
+st.table(rf_data[["Date", "Price", "Discount", "RF_Predicted_Discount_Percent"]].tail(10))
+
+
+# Generate strategic recommendations using the ARIMA forecast data.
 recommendations = generate_strategy_recommendation(
     selected_product,
     product_data_with_predictions,
-    sentiments if not product_reviews.empty else "No reviews available",
+    sentiments if not product_reviews.empty else "No reviews available"
 )
 st.subheader("Strategic Recommendations")
 st.write(recommendations)
 send_to_slack(recommendations)
-
