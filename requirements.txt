@@ -11,6 +11,6 @@ transformers
 selenium
 webdriver-manager
 openai
-torch
+torch==1.13.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
 tensorflow
 
