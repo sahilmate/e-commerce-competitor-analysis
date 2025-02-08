@@ -37,7 +37,11 @@ def load_reviews_data():
 
 def analyze_sentiment(reviews):
     """Analyze customer sentiment for reviews."""
-    sentiment_pipeline = pipeline("sentiment-analysis")  # HuggingFace Transformer Pipeline
+    sentiment_pipeline = pipeline(
+        "sentiment-analysis",
+        model="distilbert-base-uncased-finetuned-sst-2-english",
+        revision="main"  # or a specific revision if needed
+    )
     return sentiment_pipeline(reviews)
 
 def train_predictive_model(data):

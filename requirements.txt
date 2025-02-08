@@ -11,3 +11,6 @@ transformers
 selenium
 webdriver-manager
 openai
+torch
+tensorflow
+
