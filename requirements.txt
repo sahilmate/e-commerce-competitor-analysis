@@ -1,6 +1,5 @@
---find-links https://download.pytorch.org/whl/torch_stable.html
-streamlit==1.42.0
-transformers==4.48.3
+streamlit
+transformers
 numpy
 pandas
 plotly
@@ -10,4 +9,3 @@ statsmodels
 selenium
 webdriver-manager
 openai
-torch==2.2.2
