@@ -1,16 +1,13 @@
-streamlit
-transformers
+--find-links https://download.pytorch.org/whl/torch_stable.html
+streamlit==1.42.0
+transformers==4.48.3
 numpy
 pandas
 plotly
 requests
 scikit-learn
 statsmodels
-streamlit
-transformers
 selenium
 webdriver-manager
 openai
-torch==1.13.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
-tensorflow
-
+torch==2.2.2
