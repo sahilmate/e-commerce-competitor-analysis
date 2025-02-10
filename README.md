@@ -56,8 +56,8 @@ pip install -r requirements.txt
 Create a `.env` file in the root directory of the project and add your sensitive API keys and webhook URL.
 
 ```env
-GROQ_API_KEY=your_groq_api_key
-SLACK_WEBHOOK_URL=your_slack_webhook_url
+GROQ_API_KEY="your_groq_api_key"
+SLACK_WEBHOOK_URL="your_slack_webhook_url"
 ```
 
 ### 4. Running the project
