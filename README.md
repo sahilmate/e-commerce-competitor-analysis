@@ -127,15 +127,16 @@ webdriver_manager==3.8.5
 
 The project requires two key components to work:
 
-1. **GROQ API Key**: Used to generate strategic recommendations based on competitor data, sentiment, and forecasting. You can obtain your API key from [Groq](https://groq.com/).
+1. **GROQ API Key**: Used to generate strategic recommendations based on competitor data, sentiment, and forecasting. You can obtain your API key from [Groq](https://console.groq.com/keys).
 
 2. **Slack Webhook URL**: Used to send the strategic recommendations directly to a Slack channel. You can create a Slack Webhook URL [here](https://api.slack.com/messaging/webhooks).
+   First create a Slack workspace, then search for "Incoming Webhooks" and add the channel name to integrate webhooks on the channel. Copy the Slack Webhook URL as well.
 
 Make sure to store these values securely in the `.env` file, as shown below:
 
 ```env
-GROQ_API_KEY=your_groq_api_key
-SLACK_WEBHOOK_URL=your_slack_webhook_url
+GROQ_API_KEY="your_groq_api_key"
+SLACK_WEBHOOK_URL="your_slack_webhook_url"
 ```
 ## Slack Webhook Image:
 ![Slack Webhook Image](https://github.com/sahilmate/e-commerce-competitor-analysis/blob/main/Slack%20Webhook.jpeg)
